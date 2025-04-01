@@ -1,0 +1,243 @@
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  flex-shrink: 0;
+  background-color: white;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  z-index: 10;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+  min-width: 80px;
+}
+
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border-bottom: 1px solid #eee;
+  gap: 8px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: white;
+  padding: 24px;
+  width: 100%;
+  position: relative;
+  border-bottom: 1px solid #fce4ec;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-grow: 1;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+  padding: 0;
+}
+
+.animated-logo {
+  width: 24px;
+  height: 24px;
+  color: #e91e63;
+}
+
+.sidebar-title {
+  color: #e91e63;
+  font-size: 1.8rem;
+  margin: 0;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.animated-text {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #e91e63;
+}
+
+.seller-name {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 0 20px 20px 20px;
+}
+
+.sidebar-toggle {
+  background: #e91e63;
+  border: none;
+  color: white;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(233, 30, 99, 0.25);
+  margin-left: 12px;
+  z-index: 100;
+  outline: none !important;
+  position: relative;
+}
+
+.toggle-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(233, 30, 99, 0.4);
+}
+
+.sidebar.collapsed .sidebar-toggle {
+  margin: 20px auto;
+  background: #e91e63;
+  color: white;
+  border-radius: 8px;
+}
+
+.sidebar-toggle:hover {
+  background-color: #ff4081;
+  color: white;
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
+  transform: scale(1.05);
+}
+
+.sidebar-toggle svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5;
+  color: white;
+  stroke: white;
+  fill: none;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Navigation Menu */
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  flex-grow: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.nav-icon {
+  margin-right: 15px;
+  font-size: 18px;
+}
+
+.nav-item:hover {
+  background-color: #f9f9f9;
+  color: #e91e63;
+}
+
+.nav-item.active {
+  background-color: #fce4ec;
+  color: #e91e63;
+  border-left: 4px solid #e91e63;
+}
+
+/* Logout Button */
+.logout-button {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  margin-top: auto;
+  margin-bottom: 20px;
+  transition: all 0.3s;
+}
+
+.logout-icon {
+  margin-right: 15px;
+  font-size: 18px;
+}
+
+.logout-button:hover {
+  background-color: #f9f9f9;
+  color: #e91e63;
+}
+
+/* Main Content */
+.main-content {
+  flex-grow: 1;
+  transition: all 0.3s ease;
+  overflow-x: hidden;
+  margin-left: 280px;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.main-content.expanded {
+  margin-left: 80px;
+}
