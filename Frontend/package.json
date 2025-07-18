@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-slot": "^1.1.2",
+    "axios": "^1.9.0",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.4.2",
+    "framer-motion": "^12.6.3",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",

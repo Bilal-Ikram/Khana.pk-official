@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 257">
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9ED8"/>
+      <stop offset="100%" stop-color="#FF4795"/>
+    </linearGradient>
+    <linearGradient id="gradient2" x1="43%" y1="2%" x2="50%" y2="89%">
+      <stop offset="0%" stop-color="#FFE083"/>
+      <stop offset="8%" stop-color="#FFCC35"/>
+      <stop offset="100%" stop-color="#FF8800"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Food shape background -->
+  <path fill="url(#gradient1)" d="M205 80c-10-15-90-40-150-20c-20 10-40 40-30 80c10 40 40 70 100 90c20 5 60 5 80-10c30-20 50-60 40-100c-5-20-20-20-40-40z"/>
+  
+  <!-- Fork icon -->
+  <path fill="url(#gradient2)" d="M160 40c-5 2-10 5-15 10l-50 90c-2 4 1 8 5 7l20-5c2-1 4 1 3 3l-7 36c-1 3 2 5 4 4l15-4c2-1 4 1 4 3l-12 50c-1 4 4 6 6 3l70-140c1-2-1-5-3-4l-25 5c-2 0-4-2-3-4l15-50c1-2-1-5-4-4z"/>
+  
+  <!-- Food item: Curry in a bowl -->
+  <ellipse cx="128" cy="135" rx="45" ry="25" fill="#D6A263" stroke="#8B4513" stroke-width="2" />
+  <ellipse cx="128" cy="130" rx="38" ry="18" fill="#FFA500" />
+  
+  <!-- Food details -->
+  <circle cx="115" cy="125" r="5" fill="#8B4513" />
+  <circle cx="135" cy="128" r="4" fill="#8B4513" />
+  <circle cx="123" cy="135" r="6" fill="#228B22" />
+  <circle cx="140" cy="122" r="4" fill="#228B22" />
+  <circle cx="110" cy="132" r="3" fill="#FF4500" />
+  <circle cx="130" cy="127" r="3" fill="#FF4500" />
+  
+  <!-- Steam -->
+  <path d="M115,110 Q120,100 125,110 Q130,100 135,110 Q140,100 145,110" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+</svg>

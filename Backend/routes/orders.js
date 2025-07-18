@@ -4,6 +4,36 @@ const Order = require('../models/Order');
 const Restaurant = require('../models/Restaurant');
 const { verifyToken } = require('../controllers/auth');
 const whatsappService = require('../services/whatsappService');
+const multer = require('multer');
+const path = require('path');
+const { requireAuth } = require('../middleware/auth');
+const { upload } = require('../config/cloudinary');
+
+// Configure multer for photo uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/reviews')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, 'review-' + uniqueSuffix + path.extname(file.originalname))
+  }
+});
+
+const uploadMulter = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+    files: 5 // max 5 files
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
 
 // Create a new order
 router.post('/', verifyToken, async (req, res) => {
@@ -498,92 +528,73 @@ router.get('/restaurant/:restaurantId', verifyToken, async (req, res) => {
 // Get orders for a user
 router.get('/user/orders', verifyToken, async (req, res) => {
   try {
+    console.log('Fetching orders for user:', req.user.id);
+    
+    if (!req.user || !req.user.id) {
+      console.error('User ID missing in request:', req.user);
+      return res.status(401).json({ message: 'Authentication failed: User ID missing' });
+    }
+    
     const orders = await Order.find({ user: req.user.id })
       .populate('restaurantId', 'name')
       .sort({ createdAt: -1 });
     
+    console.log(`Found ${orders.length} orders for user ${req.user.id}`);
     res.json(orders);
   } catch (err) {
+    console.error('Error fetching user orders:', err);
     res.status(500).json({ message: err.message });
   }
 });
 
 // Update order status
-router.patch('/:id/status', verifyToken, async (req, res) => {
+router.put('/:id/status', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, note } = req.body;
+    const { status } = req.body;
 
-    console.log('Updating order status:', {
-      orderId: id,
-      newStatus: status,
-      userId: req.user?._id || req.user?.id,
-      userRole: req.user?.role
+    console.log('Updating order status:', { 
+      orderId: id, 
+      newStatus: status, 
+      userId: req.user.id,
+      userRole: req.user.role
     });
 
     // Validate status
-    const validStatuses = ['confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'];
+    const validStatuses = ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ 
-        message: 'Invalid status',
-        validStatuses
-      });
+      return res.status(400).json({ message: 'Invalid status value' });
     }
 
     // Find order
     const order = await Order.findById(id);
     if (!order) {
-      console.error('Order not found:', id);
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Find restaurant
+    // Verify restaurant owner
     const restaurant = await Restaurant.findById(order.restaurantId);
     if (!restaurant) {
-      console.error('Restaurant not found for order:', {
-        orderId: id,
-        restaurantId: order.restaurantId
-      });
+      console.error('Restaurant not found for order:', { orderId: id, restaurantId: order.restaurantId });
       return res.status(404).json({ message: 'Restaurant not found' });
     }
 
     // Convert IDs to strings for comparison
-    const requestUserId = (req.user?._id || req.user?.id)?.toString();
-    const restaurantOwnerId = restaurant.owner?.toString();
-
-    console.log('Authorization check:', {
-      requestUserId,
-      restaurantOwnerId,
-      orderId: id,
-      restaurantId: restaurant._id?.toString(),
-      match: requestUserId === restaurantOwnerId,
-      userRole: req.user?.role
+    const userId = req.user.id.toString();
+    const restaurantOwnerId = restaurant.owner.toString();
+    
+    console.log('Authorization check:', { 
+      userId, 
+      restaurantOwnerId, 
+      match: userId === restaurantOwnerId,
+      types: {
+        userId: typeof userId,
+        restaurantOwnerId: typeof restaurantOwnerId
+      }
     });
 
-    // Verify restaurant ownership
-    if (!requestUserId || !restaurantOwnerId) {
-      console.error('Missing user or restaurant owner ID:', {
-        hasUserId: !!requestUserId,
-        hasOwnerId: !!restaurantOwnerId,
-        userRole: req.user?.role
-      });
-      return res.status(403).json({ 
-        message: 'Not authorized to update this order',
-        details: 'Authentication error'
-      });
-    }
-
-    if (requestUserId !== restaurantOwnerId) {
-      console.error('User is not restaurant owner:', {
-        requestUserId,
-        restaurantOwnerId,
-        orderId: id,
-        userRole: req.user?.role
-      });
-      return res.status(403).json({ 
-        message: 'Not authorized to update this order',
-        details: 'You must be the restaurant owner'
-      });
+    if (userId !== restaurantOwnerId) {
+      return res.status(403).json({ message: 'Not authorized to update this order' });
     }
 
     // Update status
@@ -591,95 +602,116 @@ router.patch('/:id/status', verifyToken, async (req, res) => {
     order.statusHistory.push({
       status,
       timestamp: new Date(),
-      note: note || `Order status updated to ${status}`
+      note: `Status updated to ${status}`
     });
 
-    // If order is delivered, update payment status for COD
-    if (status === 'delivered' && order.paymentMethod === 'cod') {
-      order.paymentStatus = 'completed';
-    }
+    await order.save();
+    console.log('Order status updated successfully:', { orderId: id, newStatus: status });
 
-    const updatedOrder = await order.save();
-
-    // Send WhatsApp notification for status updates
-    try {
-      await whatsappService.sendOrderStatusUpdate(
-        updatedOrder,
-        order.deliveryDetails.phone
-      );
-      console.log('WhatsApp notification sent successfully for order:', id);
-    } catch (whatsappError) {
-      console.error('Failed to send WhatsApp notification:', whatsappError);
-      // Don't fail the status update if WhatsApp notification fails
-    }
-
-    console.log('Order status updated successfully:', {
-      orderId: id,
-      newStatus: status,
-      userId: requestUserId,
-      userRole: req.user?.role
-    });
-
-    res.json({
-      message: 'Order status updated successfully',
-      order: updatedOrder
-    });
+    res.json({ message: 'Order status updated successfully', order });
   } catch (err) {
-    console.error('Error updating order status:', {
-      error: err.message,
-      stack: err.stack,
-      orderId: req.params.id,
-      userId: req.user?._id || req.user?.id,
-      userRole: req.user?.role
-    });
-    res.status(500).json({ 
-      message: 'Failed to update order status',
-      error: err.message 
-    });
+    console.error('Error updating order status:', err);
+    res.status(500).json({ message: err.message });
   }
 });
 
-// Add rating and review
-router.post('/:id/rating', async (req, res) => {
+// Upload photos for order rating
+router.post('/:id/photos', requireAuth, upload.array('photos', 5), async (req, res) => {
   try {
-    const { id } = req.params;
-    const { stars, review } = req.body;
+    const order = await Order.findOne({ 
+      _id: req.params.id,
+      user: req.user.id 
+    });
 
-    const order = await Order.findById(id);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Only allow rating if order is delivered
+    if (order.status !== 'delivered') {
+      return res.status(400).json({ message: 'Can only add photos to delivered orders' });
+    }
+
+    // Get Cloudinary URLs from uploaded files
+    const photoUrls = req.files.map(file => file.path);
+
+    res.json({ 
+      success: true,
+      photoUrls 
+    });
+  } catch (err) {
+    console.error('Error uploading photos:', err);
+    res.status(500).json({ message: 'Error uploading photos' });
+  }
+});
+
+// Add rating to order
+router.post('/:id/rating', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { score, review, photos } = req.body;
+
+    if (!score || score < 1 || score > 5) {
+      return res.status(400).json({ message: 'Rating score must be between 1 and 5' });
+    }
+
+    const order = await Order.findOne({
+      _id: id,
+      user: req.user.id
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
     if (order.status !== 'delivered') {
       return res.status(400).json({ message: 'Can only rate delivered orders' });
     }
 
-    // Only allow rating once
-    if (order.rating && order.rating.stars) {
-      return res.status(400).json({ message: 'Order already rated' });
-    }
-
     order.rating = {
-      stars,
-      review,
-      timestamp: new Date()
+      score,
+      review: review || null,
+      photos: photos || [],
+      createdAt: new Date()
     };
 
-    // Update restaurant rating
-    const restaurant = await Restaurant.findById(order.restaurantId);
-    const newTotalRatings = restaurant.totalRatings + 1;
-    const newRating = (restaurant.rating * restaurant.totalRatings + stars) / newTotalRatings;
-    
-    await Restaurant.findByIdAndUpdate(order.restaurantId, {
-      rating: newRating,
-      totalRatings: newTotalRatings
-    });
+    await order.save();
 
-    const updatedOrder = await order.save();
-    res.json(updatedOrder);
+    // Update restaurant's average rating
+    const restaurant = await Restaurant.findById(order.restaurantId);
+    if (restaurant) {
+      const orders = await Order.find({
+        restaurantId: restaurant._id,
+        'rating.score': { $exists: true }
+      });
+
+      const totalScore = orders.reduce((sum, o) => sum + o.rating.score, 0);
+      restaurant.rating = totalScore / orders.length;
+      restaurant.totalRatings = orders.length;
+      await restaurant.save();
+    }
+
+    res.json({ 
+      message: 'Rating added successfully',
+      order: await order.populate('user', 'name')
+    });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error('Error adding rating:', err);
+    res.status(500).json({ message: 'Failed to add rating' });
+  }
+});
+
+// Get user's order history
+router.get('/user/history', verifyToken, async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user.id })
+      .sort({ createdAt: -1 })
+      .populate('restaurantId', 'name phone email address')
+      .lean();
+
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching order history:', err);
+    res.status(500).json({ message: 'Failed to fetch order history', error: err.message });
   }
 });
 

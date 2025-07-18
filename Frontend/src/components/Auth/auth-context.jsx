@@ -12,14 +12,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is logged in on mount
     if (token) {
+      console.log('Token found in localStorage, fetching user data');
       fetchUserData(token);
     } else {
+      console.log('No token found in localStorage');
       setLoading(false);
     }
   }, [token]);
 
   const fetchUserData = async (token) => {
     try {
+      console.log('Fetching user data with token');
       const response = await fetch(`${API_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -29,14 +32,18 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const userData = await response.json();
+        console.log('User data fetched successfully');
         setUser(userData.user);
       } else {
         // Token is invalid or expired
+        console.error('Failed to fetch user data:', response.status);
         handleLogout();
+        toast.error('Your session has expired. Please log in again.');
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
       handleLogout();
+      toast.error('Connection error. Please try again.');
     } finally {
       setLoading(false);
     }

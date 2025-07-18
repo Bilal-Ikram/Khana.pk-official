@@ -5,7 +5,13 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'agrandir': ['"PP Agrandir"', 'sans-serif'],
+        'poppins': ['Poppins', 'sans-serif'],
+        'sans': ['"Open Sans"']
+      }
+    },
   },
   plugins: [],
 }

@@ -1,107 +1,115 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import  { useState } from "react";
+import { motion } from "framer-motion";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
 const CityGrid = () => {
-  const [hoveredCity, setHoveredCity] = useState(null);
-  
-  // Updated city data with image URLs and link URLs
+  const [loadingCity, setLoadingCity] = useState(null);
+
   const cities = [
-    { 
-      name: 'Islamabad', 
-      description: 'The capital city',
-      imageUrl: 'https://plus.unsplash.com/premium_photo-1697729758639-d692c36557b2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://visitislamabad.gov.pk'
+    {
+      name: "Karachi",
+      description: "City of Lights",
+      imageUrl:
+        "https://images.deliveryhero.io/image/foodpanda/city-tile-pk/Karachi.jpg?width=720",
+      linkUrl: "https://karachi.gov.pk",
     },
-    { 
-      name: 'Karachi', 
-      description: 'The largest metropolis',
-      imageUrl: 'https://plus.unsplash.com/premium_photo-1697730196206-7d8f455766bf?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://karachicity.gov.pk'
+    {
+      name: "Lahore",
+      description: "Heart of Pakistan",
+      imageUrl:
+        "https://images.deliveryhero.io/image/foodpanda/city-tile-pk/Lahore.jpg?width=720",
+      linkUrl: "https://lahore.gov.pk",
     },
-    { 
-      name: 'Lahore', 
-      description: 'Cultural heart of Pakistan',
-      imageUrl: 'https://images.unsplash.com/photo-1613768412322-0a6138a9bb6b?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://lahore.gop.pk'
+    {
+      name: "Islamabad",
+      description: "Capital City",
+      imageUrl:
+        "https://images.deliveryhero.io/image/foodpanda/city-tile-pk/Islamabad.jpg?width=720",
+      linkUrl: "https://islamabad.gov.pk",
     },
-    { 
-      name: 'Faisalabad', 
-      description: 'Industrial hub',
-      imageUrl: 'https://images.unsplash.com/photo-1635602739175-bab409a6e94c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://faisalabad.gov.pk'
+    {
+      name: "Faisalabad",
+      description: "Manchester of Pakistan",
+      imageUrl: "https://images.deliveryhero.io/image/foodpanda/city-tile-pk/Faisalabad.jpg?width=720",
+      linkUrl: "https://faisalabad.gov.pk",
     },
-    { 
-      name: 'Rawalpindi', 
-      description: 'Twin city of Islamabad',
-      imageUrl: 'https://images.unsplash.com/photo-1614254613489-71538f7ae568?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://rwp.punjab.gov.pk'
+    {
+      name: "Rawalpindi",
+      description: "Twin City",
+      imageUrl: "https://images.deliveryhero.io/image/foodpanda/city-tile-pk/Rawalpindi.jpg?width=720",
+      linkUrl: "https://rawalpindi.gov.pk",
     },
-    { 
-      name: 'Peshawar', 
-      description: 'Gateway to the Khyber Pass',
-      imageUrl: 'https://images.unsplash.com/photo-1567499477991-848a1cb9a337?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://peshawar.gov.pk'
+    {
+      name: "Abbottabad",
+      description: "City of Saints",
+      imageUrl:
+        "https://images.deliveryhero.io/image/fd-pk/city-tile/city-tile-Abottabad.jpg?width=720",
+      linkUrl: "https://abbottabad.gov.pk",
     },
-    { 
-      name: 'Quetta', 
-      description: 'Capital of Balochistan',
-      imageUrl: 'https://images.unsplash.com/photo-1623746335279-299087cf398f?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://quetta.gov.pk'
+    {
+      name: "Bahawalpur",
+      description: "City of Pearls",
+      imageUrl:
+        "https://images.deliveryhero.io/image/fd-pk/city-tile/city-tile-Bahawalpur.jpg?width=720",
+      linkUrl: "https://bahawalpur.gov.pk",
     },
-    { 
-      name: 'Multan', 
-      description: 'City of Saints',
-      imageUrl: 'https://images.unsplash.com/photo-1595422656453-db310c973901?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://multan.gop.pk'
+    {
+      name: "Dera Ghazi Khan",
+      description: "City of Flowers",
+      imageUrl:
+        "https://images.deliveryhero.io/image/fd-pk/city-tile/city-tile-DeraGhaziKhan.jpg?width=720",
+      linkUrl: "https://deraghazikhan.gov.pk",
     },
-    { 
-      name: 'Hyderabad', 
-      description: 'Second largest city in Sindh',
-      imageUrl: 'https://images.unsplash.com/photo-1563873011-7cbb78c3ab4e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://hyderabad.gov.pk'
+    {
+      name: "Gujranwala",
+      description: "Fruit Garden of Pakistan",
+      imageUrl:
+        "https://images.deliveryhero.io/image/fd-pk/city-tile/city-tile-Gujranwala.jpg?width=720",
+      linkUrl: "https://gujranwala.gov.pk",
     },
-    { 
-      name: 'Gujranwala', 
-      description: 'City of wrestlers',
-      imageUrl: 'https://images.unsplash.com/photo-1603502738504-be87b04c4f53?q=80&w=2061&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://gujranwala.gop.pk'
+    {
+      name: "Gujrat",
+      description: "City of Sports",
+      imageUrl: "https://images.deliveryhero.io/image/fd-pk/city-tile/city-tile-Gujrat.jpg.jpg?width=720",
+      linkUrl: "https://gujrat.gov.pk",
     },
-    { 
-      name: 'Sialkot', 
-      description: 'Sports goods manufacturing',
-      imageUrl: 'https://images.unsplash.com/photo-1600417613469-12a66c7270af?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://sialkot.gov.pk'
+    {
+      name: "Hyderabad",
+      description: "City of Wrestlers",
+      imageUrl: "https://images.deliveryhero.io/image/foodpanda/city-tile-pk/Hyderabad.jpg?width=720",
+      linkUrl: "https://hyderabad.gov.pk",
     },
-    { 
-      name: 'Bahawalpur', 
-      description: 'City of palaces',
-      imageUrl: 'https://images.unsplash.com/photo-1585808184069-80709901b36d?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://bahawalpur.gop.pk'
+    {
+      name: "Jhelum",
+      description: "City of Eagles",
+      imageUrl: "https://images.deliveryhero.io/image/fd-pk/city-tile/city-tile-Jhelum.jpg?width=720",
+      linkUrl: "https://jhelum.gov.pk",
     },
-    { 
-      name: 'Sargodha', 
-      description: 'Known for citrus fruits',
-      imageUrl: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?q=80&w=2030&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://sargodha.gop.pk'
+    {
+      name: "Larkana",
+      description: "City of Nawabs",
+      imageUrl: "https://images.deliveryhero.io/image/fd-pk/city-tile/city-tile-Larkana.jpg?width=720",
+      linkUrl: "https://larkana.gov.pk",
     },
-    { 
-      name: 'Abbottabad', 
-      description: 'Mountain city',
-      imageUrl: 'https://images.unsplash.com/photo-1631035701710-3cc7e0818ff4?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://abbottabad.gov.pk'
+    {
+      name: "Multan",
+      description: "City of Saints",
+      imageUrl: "https://images.deliveryhero.io/image/foodpanda/city-tile-pk/Multan.jpg?width=720",
+      linkUrl: "https://multan.gov.pk",
     },
-    { 
-      name: 'Mardan', 
-      description: 'Second largest city in KPK',
-      imageUrl: 'https://images.unsplash.com/photo-1594818379496-da1e345b0ded?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://mardan.gov.pk'
+    {
+      name: "Peshawar",
+      description: "Second largest city in KPK",
+      imageUrl: "https://images.deliveryhero.io/image/foodpanda/city-tile-pk/Peshawar.jpg?width=720",
+      linkUrl: "https://peshawar.gov.pk",
     },
-    { 
-      name: 'Larkana', 
-      description: 'Cultural center of Sindh',
-      imageUrl: 'https://images.unsplash.com/photo-1588685232180-8bb64cb4837a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      linkUrl: 'https://larkana.gov.pk'
-    }
+    {
+      name: " Quetta",
+      description: "Cultural center of Sindh",
+      imageUrl: "https://images.deliveryhero.io/image/fd-pk/city-tile/city-tile-Quetta.jpg?width=720",
+      linkUrl: "https://larkana.gov.pk",
+    },
   ];
 
   // Animation variants
@@ -110,9 +118,9 @@ const CityGrid = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
@@ -121,92 +129,131 @@ const CityGrid = () => {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.5
+        duration: 0.5,
+      },
+    },
+  };
+
+  // Function to check if city has restaurants
+  const checkCityRestaurants = async (city) => {
+    try {
+      setLoadingCity(city.name);
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
+      const response = await axios.get(`${apiUrl}/api/restaurants`, {
+        params: {
+          city: city.name,
+        },
+      });
+
+      if (response.data.length === 0) {
+        // Show coming soon message
+        toast.error(`Restaurants in ${city.name} coming soon!`, {
+          duration: 4000,
+          position: "top-center",
+          style: {
+            background: "#FEE2E2",
+            color: "#991B1B",
+            padding: "16px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+          },
+        });
+      } else {
+        // Trigger location search event
+        const searchEvent = new CustomEvent("locationSearch", {
+          detail: { results: response.data, location: city.name },
+        });
+        document.dispatchEvent(searchEvent);
+
+        // Scroll to restaurant list section
+        setTimeout(() => {
+          const restaurantSection =
+            document.querySelector("#restaurantListing");
+          if (restaurantSection) {
+            restaurantSection.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 500);
       }
+    } catch (error) {
+      console.error("Error checking restaurants:", error);
+      toast.error("Error checking restaurants. Please try again.");
+    } finally {
+      setLoadingCity(null);
     }
   };
 
-  // Handle click on the explore button
-  const handleExploreClick = (url) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
   return (
-    <div className="bg-white min-h-screen py-12">
-      <div className="container mx-auto px-4">
-        <motion.div 
+    <div className="bg-white min-h-screen py-10">
+      <div className="mx-auto">
+        <motion.div
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold text-pink-500 mb-4 tracking-widest">DISCOVER FOOD IN PAKISTAN</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">Find us in these beautiful cities and many more across the country</p>
+          <h1 className="text-4xl font-bold text-pink-500 mb-4 tracking-widest">
+            DISCOVER FOOD IN PAKISTAN
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Find us in these beautiful cities and many more across the country
+          </p>
         </motion.div>
-        
-        <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center p-8 "
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {cities.map((city, index) => (
             <motion.div
-              key={city.name}
+              key={index}
               variants={itemVariants}
-              whileHover={{ 
-                y: -10,
-                transition: { duration: 0.3 }
-              }}
-              onMouseEnter={() => setHoveredCity(city.name)}
-              onMouseLeave={() => setHoveredCity(null)}
-              className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-pink-100"
+              className="relative group"
             >
-              <div className="relative h-52 overflow-hidden">
-                {/* Use the actual image URL instead of placeholder */}
-                <motion.img
-                  src={city.imageUrl}
-                  alt={`${city.name} city`}
-                  className="w-full h-full object-cover"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.5 }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-pink-500/70 via-pink-400/30 to-transparent">
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <motion.h2 
-                      initial={{ x: -10, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                      className="text-white font-bold text-xl"
-                    >
-                      {city.name}
-                    </motion.h2>
-                  </div>
-                </div>
-              </div>
-              
-              <motion.div 
-                className="p-4"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ 
-                  opacity: hoveredCity === city.name ? 1 : 0.8,
-                  height: 'auto'
-                }}
-                transition={{ duration: 0.3 }}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="relative overflow-hidden rounded-3xl"
               >
-                <p className="text-gray-600">{city.description}</p>
-                <button 
-                  onClick={() => handleExploreClick(city.linkUrl)}
-                  className="mt-4 px-4 py-2 bg-pink-500 text-white rounded-lg text-sm font-medium hover:bg-pink-600 transition-colors duration-300"
+                <img
+                  onClick={() => checkCityRestaurants(city)}
+                  src={city.imageUrl}
+                  alt={city.name}
+                  className="w-full h-full  object-cover transition-transform duration-300 group-hover:scale-110 cursor-pointer"
+                />
+                <div className="absolute" />
+                <motion.div
+                  className="absolute bottom-0 left-0 right-0 px-2 py-2 text-white"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
                 >
-                  Explore {city.name}
-                </button>
+                  {/* <h3 className="text-xl font-bold mb-2">{city.name}</h3> */}
+                  {/* <p className="text-gray-200">{city.description}</p> */}
+                  <button
+                    onClick={() => checkCityRestaurants(city)}
+                    disabled={loadingCity === city.name}
+                    className="px-4 py-2 bg-white text-[#2E3138] font-agrandir font-medium rounded-lg text-lg  leading-7 hover:bg-pink-600 hover:text-white transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap overflow-hidden text-ellipsis "
+                  >
+                    {loadingCity === city.name ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Checking...
+                      </>
+                    ) : (
+                      <>
+                        {/* <MapPin className="w-4 h-4" /> */}
+                        {city.name}
+                      </>
+                    )}
+                  </button>
+                </motion.div>
               </motion.div>
             </motion.div>
           ))}
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 0.8 }}

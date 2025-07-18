@@ -1,122 +1,317 @@
-import React, { useState, useEffect } from 'react';
-import CreattieEmbed from '../Hero_bg_lottifiles_code/CreattieEmbed';
-import CreattieEmbed2 from '../Hero_bg_lottifiles_code/CreattieEmbed2';
-import CreattieEmbed3 from '../Hero_bg_lottifiles_code/CreattieEmbed3';
-import CreattieEmbed4 from '../Hero_bg_lottifiles_code/CreattieEmbed4';
-
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Search, MapPin, ArrowRight } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import tacos from "../../assets/tacos.jpg";
+import biryani from "../../assets/biryani.jpg";
 const HeroSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [showBanner, setShowBanner] = useState(true);
+  const [locationInput, setLocationInput] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchComplete, setSearchComplete] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [locationSuggestions, setLocationSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const slides = [
-    {
-      component: <CreattieEmbed />,
-      alt: "Food slide 1"
-    },
-    {
-      component: <CreattieEmbed2 />,
-      alt: "Food slide 2"
-    },
-    {
-      component: <CreattieEmbed3 />,
-      alt: "Food slide 3"
-    },
-    {
-      component: <CreattieEmbed4 />,
-      alt: "Food slide 4"
-    }
+  // List of major cities in Pakistan
+  const majorCities = [
+    'Karachi', 'Lahore', 'Islamabad', 'Faisalabad', 'Rawalpindi',
+    'Multan', 'Hyderabad', 'Peshawar', 'Quetta', 'Sialkot',
+    'Gujranwala', 'Sargodha', 'Bahawalpur', 'Sukkur', 'Larkana',
+    'Sheikhupura', 'Rahim Yar Khan', 'Jhang', 'Mardan', 'Gujrat'
   ];
 
-  const nextSlide = () => {
-    if (!isAnimating) {
-      setIsAnimating(true);
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-      setTimeout(() => setIsAnimating(false), 1000);
+  // Function to get location suggestions
+  const getLocationSuggestions = (input) => {
+    if (!input.trim()) {
+      setLocationSuggestions([]);
+      return;
     }
+
+    const suggestions = majorCities.filter(city =>
+      city.toLowerCase().includes(input.toLowerCase())
+    );
+    setLocationSuggestions(suggestions);
+    setShowSuggestions(true);
   };
 
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 4000);
-    return () => clearInterval(timer);
-  }, [isAnimating]);
-
-  const handleManualSlideChange = (index) => {
-    if (!isAnimating && index !== currentSlide) {
-      setIsAnimating(true);
-      setCurrentSlide(index);
-      setTimeout(() => setIsAnimating(false), 1000);
-    }
+  // Function to handle location input change
+  const handleLocationInputChange = (e) => {
+    const value = e.target.value;
+    setLocationInput(value);
+    getLocationSuggestions(value);
   };
 
-  // Calculate the top padding based on banner visibility
-  const topPadding = showBanner ? "pt-[0px]" : "pt-[0px]"; // 144px when banner is visible, 80px when hidden
+  // Function to select a location suggestion
+  const selectLocation = (city) => {
+    setLocationInput(city);
+    setShowSuggestions(false);
+    searchRestaurantsByLocation(city);
+  };
+
+  // Function to search restaurants by location
+  const searchRestaurantsByLocation = async (location = locationInput) => {
+    if (!location || !location.trim()) {
+      toast.error('Please enter a location');
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      setSearchComplete(false);
+      setErrorMessage('');
+      setShowSuggestions(false);
+
+      // Get the API URL from environment variables or use the default
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      
+      // Call the backend API to search for restaurants in the specified location
+      const response = await axios.get(`${apiUrl}/api/restaurants`, {
+        params: {
+          city: location.trim()
+        }
+      });
+
+      // Set the search results
+      setSearchResults(response.data);
+      
+      // Handle the case when no restaurants are found
+      if (response.data.length === 0) {
+        setErrorMessage(`No restaurants available in ${location}`);
+        toast.error(`No restaurants available in ${location}`);
+      } else {
+        toast.success(`Found ${response.data.length} restaurants in ${location}`);
+        
+        // Trigger an event that the Home component can listen to
+        const searchEvent = new CustomEvent('locationSearch', {
+          detail: { results: response.data, location: location }
+        });
+        document.dispatchEvent(searchEvent);
+
+        // Scroll to restaurant list section
+        setTimeout(() => {
+          const restaurantSection = document.querySelector('#restaurantListing');
+          if (restaurantSection) {
+            restaurantSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error searching for restaurants:', error);
+      setErrorMessage('Error searching for restaurants. Please try again.');
+      toast.error('Error searching for restaurants. Please try again.');
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+      setSearchComplete(true);
+    }
+  };
 
   return (
-    <div className={`relative h-screen ${topPadding}`}>
-      {/* Slider Container */}
-      <div className="relative w-full h-full">
-        {slides.map((slide, index) => (
-          <div
-            key={index}
-            className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
-              currentSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
-            }`}
-          >
-            <div className="w-full h-full">
-              {slide.component}
-            </div>
-            {/* Dark overlay */}
-            <div className="absolute inset-0 bg-black/40" />
-          </div>
-        ))}
+    <div className="relative min-h-[200px] md:min-h-96">
+  <div className="relative w-full h-[200px] md:min-h-[436px] bg-[#f4f5f5] overflow-hidden mx-auto">
+    {/* Three-part flex layout */}
+    <div className="flex w-full h-full min-h-[200px] md:min-h-[436px]">
+      
+      {/* Left biryani image part - hidden on tablet and mobile */}
+      <div className="hidden lg:flex lg:flex-1 relative">
+        <div 
+          className="w-full h-full bg-[#f4f5f5] bg-no-repeat bg-contain bg-center"
+          style={{ backgroundImage: `url(${biryani})` }}
+        ></div>
       </div>
 
-      {/* Content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 z-20">
-        <div className="w-full max-w-3xl text-center">
-          <h1 className="mb-8 text-4xl font-bold text-white md:text-5xl lg:text-6xl">
-            Enjoy discounts on <br /> your first order
-          </h1>
+      {/* Central content part - responsive sizing */}
+      <div className="flex-2 md:flex-[2] lg:flex-[2] xl:flex-[2] relative flex flex-col items-center justify-center px-0 md:px-3 z-20">
+        <div className="w-full max-w-4xl">
           
-          {/* Search Bar */}
-          <div className="flex flex-col gap-4 md:flex-row">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Your street and street number"
-                className="w-full px-4 py-3 text-gray-700 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-              />
-              <button
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 text-pink-500 hover:text-pink-600"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                </svg>
-              </button>
+          {/* Mobile layout - fixed container with specific dimensions */}
+          <div className="md:hidden">
+            <div className={`w-full mx-auto bg-[#f4f5f5] ${searchComplete && errorMessage ? 'min-h-[200px]' : 'h-[200px]'} flex flex-col justify-center md:px-4 md:py-4 transition-all duration-300`}>
+                  <div className="flex items-center justify-between ">
+                    <div className='py-4 px-6'>
+                <div className="w-full   flex items-center">
+                  <h1 className="text-[#2E3138] font-poppins leading-[1.33] text-lg font-black text-left">
+                    Sign up for free delivery on your first order
+                  </h1>
+                      </div>
+                      </div>
+                <div className="flex-1  flex justify-center mt-12 mr-2">
+                  <div 
+                    className="w-[163px] h-[159.9px] bg-[#f4f5f5] bg-no-repeat bg-contain bg-center"
+                    style={{ backgroundImage: `url(${tacos})` }}
+                  ></div>
+                </div>
+              </div>
+              
+              {/* Search results message - show when search is complete */}
+              {searchComplete && errorMessage && (
+                <div className="mt-4 p-3 bg-white/95 rounded-lg shadow-lg">
+                  <p className="text-red-500 text-center text-sm">{errorMessage}</p>
+                  <p className="text-gray-700 text-center mt-2 text-sm">
+                    Please try searching in a different location or city.
+                  </p>
+                </div>
+              )}
             </div>
-            <button className="px-8 py-3 font-semibold text-white transition-colors bg-pink-500 rounded-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2">
-              Find food
-            </button>
           </div>
 
-          {/* Slide indicators */}
-          <div className="flex justify-center gap-2 mt-8">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => handleManualSlideChange(index)}
-                disabled={isAnimating}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  currentSlide === index ? 'bg-pink-500' : 'bg-white/50'
-                }`}
-              />
-            ))}
+          {/* Tablet and Desktop layout */}
+          <div className="hidden md:block text-center">
+            <h1 className="text-[#2E3138] font-agrandir font-black leading-[1.33] text-[1.5rem] md:text-[2rem] xl:text-[2rem] mb-6 md:text-left">
+              Sign up for free delivery on your first order
+            </h1>
+            
+            {/* Search Bar */}
+            <motion.div 
+              className="flex flex-col gap-4 md:flex-row max-w-2xl md:max-w-none"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="relative flex-[2] md:flex-[3] lg:flex-[4] xl:flex-[5]">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <MapPin className="w-5 h-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter your delivery location"
+                  className="w-full pl-6 pr-4 py-4 text-gray-700 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-base"
+                  value={locationInput}
+                  onChange={handleLocationInputChange}
+                  onKeyPress={(e) => e.key === 'Enter' && searchRestaurantsByLocation()}
+                  onFocus={() => setShowSuggestions(true)}
+                />
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-pink-500 hover:text-pink-600 transition-colors"
+                  onClick={() => searchRestaurantsByLocation()}
+                  disabled={isSearching}
+                >
+                  <Search className="w-6 h-6" />
+                </button>
+
+                {/* Location Suggestions */}
+                {showSuggestions && locationSuggestions.length > 0 && (
+                  <div className="absolute w-full mt-1 bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
+                    {locationSuggestions.map((city, index) => (
+                      <button
+                        key={index}
+                        className="w-full px-4 py-2 text-left hover:bg-pink-50 flex items-center gap-2"
+                        onClick={() => selectLocation(city)}
+                      >
+                        <MapPin className="w-4 h-4 text-pink-500" />
+                        {city}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <motion.button 
+                className="flex-2 px-3 py-2 font-semibold text-white bg-gradient-to-r from-pink-500 to-pink-600 rounded-lg hover:from-pink-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 flex items-center justify-center gap-2 text-lg shadow-lg"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => searchRestaurantsByLocation()}
+                disabled={isSearching}
+              >
+                {isSearching ? 'Searching...' : 'Find Food'}
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+            </motion.div>
           </div>
+
+          {/* Search results message - show when search is complete */}
+          {searchComplete && errorMessage && (
+            <motion.div
+              className="mt-8 p-4 bg-white/95 rounded-lg shadow-lg max-w-2xl mx-auto hidden md:block"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <p className="text-red-500 text-center">{errorMessage}</p>
+              <p className="text-gray-700 text-center mt-2">
+                Please try searching in a different location or city.
+              </p>
+            </motion.div>
+          )}
         </div>
       </div>
+
+      {/* Right tacos image part - visible on tablet and up */}
+      <div className="hidden md:flex md:flex-1 relative">
+        <div 
+          className="w-full h-full bg-[#f4f5f5] bg-no-repeat bg-contain bg-center"
+          style={{ backgroundImage: `url(${tacos})` }}
+        ></div>
+      </div>
     </div>
-  );
+  </div>
+  
+  {/* Mobile search bar - outside the main container */}
+  <div className="md:hidden px-4 mt-6">
+    <motion.div 
+      className="flex flex-col gap-4 w-full"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+    >
+      <div className="relative w-full">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <MapPin className="w-4 h-4 text-gray-400" aria-label="Location icon" />
+        </div>
+        <input
+          type="text"
+          placeholder="Enter your delivery location"
+          aria-label="Enter your delivery location"
+          className="w-full pl-10 pr-4 py-3 text-gray-700 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm shadow-lg"
+          value={locationInput}
+          onChange={handleLocationInputChange}
+          onKeyPress={(e) => e.key === 'Enter' && searchRestaurantsByLocation()}
+          onFocus={() => setShowSuggestions(true)}
+        />
+        <button
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-pink-500 hover:text-pink-600 transition-colors"
+          onClick={() => searchRestaurantsByLocation()}
+          disabled={isSearching}
+          aria-label="Search for restaurants"
+        >
+          <Search className="w-4 h-4" />
+        </button>
+
+        {/* Location Suggestions */}
+        {showSuggestions && locationSuggestions.length > 0 && (
+          <div className="absolute w-full mt-1 bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
+            {locationSuggestions.map((city, index) => (
+              <button
+                key={index}
+                className="w-full px-4 py-2 text-left hover:bg-pink-50 flex items-center gap-2"
+                onClick={() => selectLocation(city)}
+              >
+                <MapPin className="w-4 h-4 text-pink-500" />
+                {city}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Mobile button - full width */}
+      <motion.button 
+        className="w-full px-6 py-3 font-semibold text-white bg-gradient-to-r from-pink-500 to-pink-600 rounded-lg hover:from-pink-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 flex items-center justify-center gap-2 text-sm shadow-lg"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => searchRestaurantsByLocation()}
+        disabled={isSearching}
+        aria-label="Find food near you"
+      >
+        {isSearching ? 'Searching...' : 'Find Food'}
+        <ArrowRight className="w-4 h-4" />
+      </motion.button>
+    </motion.div>
+  </div>
+</div>
+
+);
 };
 
-export default HeroSection;
+export default HeroSection; 

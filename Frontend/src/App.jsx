@@ -1,19 +1,22 @@
 // src/App.jsx
-import { BrowserRouter as Router } from 'react-router-dom';
-import { Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './components/Auth/auth-context';
-import Navbar from './components/Navbar/Navbar';
-import Home from './components/Screens/Home';
-import PrivacyPolicy from './components/PrivacyPolicy/PrivacyPolicy';
-import ContactUs from './components/ContactUs/ContactUs';
-import Profile from './components/UserProfile/Profile';
-import AuthModal from './components/Auth/AuthModal';
-import RestaurantDetails from './components/RestaurantDetails/RestaurantDetails';
-import MenuItemDetail from './components/MenuItemDetail/MenuItemDetail';
-import Cart from './components/Cart/Cart';
-import Checkout from './components/Checkout/Checkout';
-import OrderTracking from './components/OrderTracking/OrderTracking';
-import { Toaster } from 'react-hot-toast';
+import { BrowserRouter as Router } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./components/Auth/auth-context";
+import Navbar from "./components/Navbar/Navbar";
+import Home from "./components/Screens/Home";
+import PrivacyPolicy from "./components/PrivacyPolicy/PrivacyPolicy";
+import ContactUs from "./components/ContactUs/ContactUs";
+import Profile from "./components/UserProfile/Profile";
+import AuthModal from "./components/Auth/AuthModal";
+import RestaurantDetails from "./components/RestaurantDetails/RestaurantDetails";
+import MenuItemDetail from "./components/MenuItemDetail/MenuItemDetail";
+import Cart from "./components/Cart/Cart";
+import Checkout from "./components/Checkout/Checkout";
+import OrderTracking from "./components/OrderTracking/OrderTracking";
+import OrderHistory from "./components/OrderHistory";
+import { Toaster } from "react-hot-toast";
+import VoiceGreeting from "./components/VoiceGreeting";
+import './styles/voiceInteraction.css';
 
 function App() {
   return (
@@ -22,6 +25,7 @@ function App() {
         <Navbar />
         <AuthModal />
         <Toaster position="top-right" />
+        <VoiceGreeting />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -32,6 +36,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders/:id" element={<OrderTracking />} />
+          <Route path="/orders" element={<OrderHistory />} />
         </Routes>
       </Router>
     </AuthProvider>

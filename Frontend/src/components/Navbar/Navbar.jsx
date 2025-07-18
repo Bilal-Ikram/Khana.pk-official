@@ -1,32 +1,55 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "../Auth/auth-context";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ShoppingCart, Languages, User, ChevronDown, X, Menu } from "lucide-react";
-import logo from "../../assets/logo.png";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { ShoppingCart, User, X, Menu } from "lucide-react";
+import logo from "../../assets/vite.svg";
 import IC from "../../assets/ic-rider-icon.svg";
-
+import PropTypes from "prop-types";
 const ChopsticksLogo = () => (
   <img src={IC} alt="chopsticks" className="w-10 h-10 md:w-12 md:h-12" />
 );
 
 const PandaLogo = () => (
-  <img src={logo} alt="panda" className="w-12 md:w-16 transition-all duration-300" />
+  <img
+    src={logo}
+    alt="panda"
+    className="w-12 md:w-16 transition-all duration-300"
+  />
 );
+
+const MobileNavLink = ({ to, children, onClick }) => (
+  <Link
+    to={to}
+    onClick={onClick}
+    className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-500 transition-all rounded-lg"
+  >
+    {children}
+  </Link>
+);
+
+MobileNavLink.propTypes = {
+  to: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showCongrats, setShowCongrats] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
-  const { user, token, logout } = useAuth();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
-  
+
   const { scrollY } = useScroll();
   const navbarOpacity = useTransform(scrollY, [0, 50], [1, 0.98]);
-  const navbarHeight = useTransform(scrollY, [0, 100], ["6rem", "4.5rem"]);
+  const navbarHeight = useTransform(scrollY, [0, 20], ["4rem", "4.4rem"]);
   const logoScale = useTransform(scrollY, [0, 100], [1, 0.9]);
 
   useEffect(() => {
@@ -39,17 +62,17 @@ const Navbar = () => {
 
   useEffect(() => {
     const loadCartItems = () => {
-      const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+      const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
       setCartItemCount(cartItems.length);
     };
 
     loadCartItems();
-    window.addEventListener('storage', loadCartItems);
-    window.addEventListener('cartUpdated', loadCartItems);
+    window.addEventListener("storage", loadCartItems);
+    window.addEventListener("cartUpdated", loadCartItems);
 
     return () => {
-      window.removeEventListener('storage', loadCartItems);
-      window.removeEventListener('cartUpdated', loadCartItems);
+      window.removeEventListener("storage", loadCartItems);
+      window.removeEventListener("cartUpdated", loadCartItems);
     };
   }, []);
 
@@ -59,30 +82,30 @@ const Navbar = () => {
       setIsScrolled(isScrolled);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleLogout = () => {
     logout();
-    setShowUserDropdown(false);
-    setIsDropdownOpen(false);
   };
 
   const navbarVariants = {
-    top: { 
+    top: {
       backgroundColor: "rgba(255, 255, 255, 1)",
       boxShadow: "0 0 0 rgba(0, 0, 0, 0)",
     },
-    scrolled: { 
+    scrolled: {
       backgroundColor: "rgba(255, 255, 255, 0.98)",
-      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-    }
+      boxShadow:
+        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+    },
   };
+
 
   return (
     <motion.nav
-      className=" z-50"
+      className="relative z-50 bg-white"
       style={{ opacity: navbarOpacity }}
       initial="top"
       animate={isScrolled ? "scrolled" : "top"}
@@ -92,15 +115,18 @@ const Navbar = () => {
       {/* Pink banner */}
       <AnimatePresence>
         {showBanner && (
-          <motion.div 
-            className="w-full bg-gradient-to-r from-pink-500 to-pink-400 py-3 px-4 relative"
+          <motion.div
+            className="hidden w-full bg-gradient-to-r from-pink-500 to-pink-400 py-3 px-4 relative"
             initial={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-4 lg:gap-6 w-full justify-center">
               <div className="flex items-center gap-3 flex-col lg:flex-row text-center lg:text-left">
-                <motion.div whileHover={{ rotate: 15 }} transition={{ duration: 0.2 }}>
+                <motion.div
+                  whileHover={{ rotate: 15 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <ChopsticksLogo />
                 </motion.div>
                 <span className="text-white font-bold text-base lg:text-lg whitespace-nowrap">
@@ -108,8 +134,11 @@ const Navbar = () => {
                 </span>
               </div>
               <div className="flex items-center gap-4">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-                  <Link 
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Link
                     to="http://localhost:5175/"
                     target="_blank"
                     className="text-white rounded-lg font-medium hover:bg-white hover:text-pink-500 p-2 lg:p-3 transition-all duration-200 border-2 border-white w-full lg:w-auto ml-2"
@@ -133,17 +162,17 @@ const Navbar = () => {
       </AnimatePresence>
 
       {/* Main navbar */}
-      <motion.div 
-        className="max-w-7xl mx-auto px-4 lg:px-8 py-3 bg-white shadow-md"
+      <motion.div
+        className="max-w-7xl mx-auto px-4 lg:px-8 py-3 bg-white shadow-md relative"
         style={{ height: navbarHeight }}
       >
         <div className="flex justify-between items-center h-full">
           {/* Logo */}
-          <motion.div style={{ scale: logoScale }}>
+          <motion.div style={{ scale: logoScale }} className="flex-shrink-0">
             <Link to="/" className="flex items-center gap-1">
               <PandaLogo />
-              <motion.span 
-                className="text-pink-500 text-2xl lg:text-3xl font-bold"
+              <motion.span
+                className="text-pink-500 text-xl lg:text-3xl font-bold"
                 initial={{ opacity: 1 }}
                 whileHover={{ color: "#db2777" }}
               >
@@ -152,47 +181,56 @@ const Navbar = () => {
             </Link>
           </motion.div>
 
-          {/* Mobile menu button */}
-          <motion.button
-            className="lg:hidden text-gray-600 p-2 rounded-md"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-            whileHover={{ backgroundColor: "#f9f9f9" }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </motion.button>
+          {/* Cart icon for mobile - Always visible */}
+          <div className="flex items-center gap-4 lg:hidden">
+            <Link
+              to="/cart"
+              className="relative text-gray-600 hover:text-pink-500 transition-colors"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              <AnimatePresence>
+                {cartItemCount > 0 && (
+                  <motion.span
+                    className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                  >
+                    {cartItemCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+
+            {/* Mobile menu button */}
+            <motion.button
+              className="text-gray-600 p-2 rounded-md hover:bg-pink-50"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+              whileHover={{ backgroundColor: "#fdf2f8" }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {isMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </motion.button>
+          </div>
 
           {/* Desktop navigation */}
           <div className="hidden lg:flex items-center gap-6">
-            <NavLink to="/">Home</NavLink>
-            <NavLink to="/privacy">Privacy Policy</NavLink>
-            <NavLink to="/contact">Contact Us</NavLink>
-            
-            {/* Language selector */}
-            <div className="flex items-center gap-2 text-gray-600 group">
-              <Languages className="w-5 h-5 group-hover:text-pink-500 transition-colors" />
-              <select className="bg-transparent border-none outline-none hover:text-pink-500 transition-colors cursor-pointer">
-                <option value="en">EN</option>
-                <option value="es">ES</option>
-                <option value="fr">FR</option>
-              </select>
-            </div>
 
             {/* Cart link */}
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Link 
-                to="/cart" 
+              <Link
+                to="/cart"
                 className="relative text-gray-600 hover:text-pink-500 transition-colors"
               >
                 <ShoppingCart className="w-6 h-6" />
                 <AnimatePresence>
                   {cartItemCount > 0 && (
-                    <motion.span 
+                    <motion.span
                       className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -204,72 +242,44 @@ const Navbar = () => {
                 </AnimatePresence>
               </Link>
             </motion.div>
-            
+
             {/* Profile/Login section */}
             {user ? (
-              <div className="relative">
-                <motion.button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-2 focus:outline-none rounded-full p-1 pr-2"
-                  whileHover={{ backgroundColor: "#f5f5f5" }}
-                >
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 border-2 border-pink-100">
-                    {user.profileImage ? (
-                      <img
-                        src={`http://localhost:3001${user.profileImage}`}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-pink-50">
-                        <User className="w-5 h-5 text-pink-400" />
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-gray-700 font-medium">{user.name}</span>
-                  <motion.div
-                    animate={{ rotate: isDropdownOpen ? 180 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
-                  </motion.div>
-                </motion.button>
-
-                <AnimatePresence>
-                  {isDropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
-                    >
-                      <Link
-                        to="/profile"
-                        className="block px-4 py-2 text-gray-700 hover:text-pink-500 hover:bg-pink-50 transition-colors"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <User className="w-4 h-4" />
-                          <span>Profile</span>
-                        </div>
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-gray-700 hover:text-pink-500 hover:bg-pink-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                            <polyline points="16 17 21 12 16 7"></polyline>
-                            <line x1="21" y1="12" x2="9" y2="12"></line>
-                          </svg>
-                          <span>Logout</span>
-                        </div>
-                      </button>
-                    </motion.div>
+              <div className="relative group">
+                <button className="flex items-center gap-2 text-gray-700 hover:text-pink-500">
+                  {user.profileImage ? (
+                    <img
+                      src={`http://localhost:3001${user.profileImage}`}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full object-cover border-2 border-pink-100"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center border-2 border-pink-100">
+                      <User size={16} className="text-pink-400" />
+                    </div>
                   )}
-                </AnimatePresence>
+                  <span>{user.name}</span>
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block z-[100]">
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-500"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/orders"
+                    className="block px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-500"
+                  >
+                    Order History
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-500"
+                  >
+                    Logout
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -297,79 +307,159 @@ const Navbar = () => {
         {/* Mobile menu */}
         <AnimatePresence>
           {isMenuOpen && (
-            <motion.div 
-              className="lg:hidden"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="absolute top-full left-0 right-0 bg-white shadow-lg rounded-b-xl lg:hidden z-50 w-full mt-1 border-t border-gray-100"
             >
-              <motion.div 
-                className="flex flex-col gap-3 mt-4 pb-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ staggerChildren: 0.1, delayChildren: 0.1 }}
-              >
-                <MobileNavLink to="/" onClick={() => setIsMenuOpen(false)}>Home</MobileNavLink>
-                <MobileNavLink to="/privacy" onClick={() => setIsMenuOpen(false)}>Privacy Policy</MobileNavLink>
-                <MobileNavLink to="/contact" onClick={() => setIsMenuOpen(false)}>Contact Us</MobileNavLink>
-                
-                <MobileNavLink to="/cart" onClick={() => setIsMenuOpen(false)}>
-                  <div className="flex items-center gap-2">
-                    <ShoppingCart className="w-5 h-5" />
-                    <span>Cart {cartItemCount > 0 && `(${cartItemCount})`}</span>
-                  </div>
-                </MobileNavLink>
-                
+              <div className="py-2">
+                {/* User section for mobile */}
                 {user ? (
-                  <>
-                    <MobileNavLink to="/profile" onClick={() => setIsMenuOpen(false)}>
-                      <div className="flex items-center gap-2">
-                        <User className="w-5 h-5" />
-                        <span>Profile</span>
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <div className="flex items-center gap-3 mb-3">
+                      {user.profileImage ? (
+                        <img
+                          src={`http://localhost:3001${user.profileImage}`}
+                          alt="Profile"
+                          className="w-10 h-10 rounded-full object-cover border-2 border-pink-100"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center border-2 border-pink-100">
+                          <User size={20} className="text-pink-400" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-medium text-gray-900">{user.name}</p>
+                        <p className="text-sm text-gray-500">{user.email}</p>
                       </div>
-                    </MobileNavLink>
-                    <motion.button
-                      onClick={handleLogout}
-                      className="px-4 py-3 text-gray-600 hover:text-pink-500 hover:bg-pink-50 transition-colors text-left rounded-md w-full"
-                      whileHover={{ backgroundColor: "#fdf2f8" }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                          <polyline points="16 17 21 12 16 7"></polyline>
-                          <line x1="21" y1="12" x2="9" y2="12"></line>
-                        </svg>
-                        <span>Logout</span>
-                      </div>
-                    </motion.button>
-                  </>
+                    </div>
+                  </div>
                 ) : (
-                  <div className="flex flex-col gap-2 mt-2">
-                    <motion.button
+                  <div className="px-4 py-3 border-b border-gray-100 space-y-2">
+                    <button
                       onClick={() => {
                         window.authModal.showLogin();
                         setIsMenuOpen(false);
                       }}
-                      className="px-4 py-3 text-gray-600 hover:text-pink-500 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors text-left w-full"
-                      whileHover={{ backgroundColor: "#f5f5f5" }}
+                      className="w-full px-4 py-2 text-gray-700 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-all text-left"
                     >
-                      Log in
-                    </motion.button>
-                    <motion.button
+                      Login
+                    </button>
+                    <button
                       onClick={() => {
                         window.authModal.showSignup();
                         setIsMenuOpen(false);
                       }}
-                      className="px-4 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-left w-full"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      className="w-full px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-all text-center font-medium"
                     >
-                      Sign up
-                    </motion.button>
+                      Sign Up
+                    </button>
                   </div>
                 )}
-              </motion.div>
+
+                {/* Navigation Links */}
+                <div className="py-2 px-2 space-y-1">
+                  {/* Voice Assistant Button for Mobile */}
+                  <div className="px-4 py-2">
+                    {/* <VoiceAssistantButton /> */}
+                  </div>
+
+                  {user && (
+                    <>
+                      <MobileNavLink
+                        to="/profile"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <User className="h-5 w-5" />
+                        Profile
+                      </MobileNavLink>
+                      <MobileNavLink
+                        to="/orders"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                          <path
+                            fillRule="evenodd"
+                            d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        Order History
+                      </MobileNavLink>
+                    </>
+                  )}
+
+                  <MobileNavLink
+                    to="/privacy"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Privacy Policy
+                  </MobileNavLink>
+
+                  <MobileNavLink
+                    to="/contact"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    Contact Us
+                  </MobileNavLink>
+                </div>
+
+                {/* Logout for mobile */}
+                {user && (
+                  <div className="px-4 py-3 border-t border-gray-100">
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -383,22 +473,35 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-            className="fixed top-24 right-4 bg-gradient-to-r from-pink-500 to-pink-400 text-white px-6 py-4 rounded-lg shadow-lg z-50"
+            className="absolute top-24 right-4 bg-gradient-to-r from-pink-500 to-pink-400 text-white px-6 py-4 rounded-lg shadow-lg z-50"
           >
             <div className="flex items-start gap-3">
               <div className="mt-1">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z" fill="white"/>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z"
+                    fill="white"
+                  />
                 </svg>
               </div>
               <div>
                 <p className="font-bold text-lg">Welcome back, {user.name}!</p>
-                <p className="text-sm opacity-90">Let's get started with your next meal.</p>
+                <p className="text-sm opacity-90">
+                  Lets get started with your next meal.
+                </p>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+
     </motion.nav>
   );
 };
@@ -406,8 +509,8 @@ const Navbar = () => {
 // Custom NavLink component for desktop navigation
 const NavLink = ({ to, children }) => (
   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-    <Link 
-      to={to} 
+    <Link
+      to={to}
       className="px-3 py-2 text-gray-600 hover:text-pink-500 transition-colors font-medium"
     >
       {children}
@@ -415,21 +518,9 @@ const NavLink = ({ to, children }) => (
   </motion.div>
 );
 
-// Custom NavLink component for mobile navigation
-const MobileNavLink = ({ to, children, onClick }) => (
-  <motion.div 
-    initial={{ opacity: 0, x: -10 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -10 }}
-  >
-    <Link 
-      to={to} 
-      className="px-4 py-3 text-gray-600 hover:text-pink-500 hover:bg-pink-50 transition-colors block rounded-md"
-      onClick={onClick}
-    >
-      {children}
-    </Link>
-  </motion.div>
-);
+NavLink.propTypes = {
+  to: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
 
 export default Navbar;

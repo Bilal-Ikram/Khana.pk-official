@@ -87,13 +87,25 @@ const orderSchema = new mongoose.Schema({
     note: String
   }],
   rating: {
-    stars: {
+    score: {
       type: Number,
       min: 1,
-      max: 5
+      max: 5,
+      default: null
     },
-    review: String,
-    timestamp: Date
+    review: {
+      type: String,
+      maxLength: 500,
+      default: null
+    },
+    photos: [{
+      type: String,  // URL/path to the uploaded photo
+      maxLength: 1000
+    }],
+    createdAt: {
+      type: Date,
+      default: null
+    }
   }
 }, {
   timestamps: true

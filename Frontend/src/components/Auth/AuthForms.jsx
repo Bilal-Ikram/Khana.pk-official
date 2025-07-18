@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "./auth-context";
+import { motion } from "framer-motion";
 
 export const Login = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -86,20 +87,37 @@ export const Signup = ({ onSuccess }) => {
     }
   });
   const [error, setError] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    special: false
+  });
+
+  const validatePassword = (password) => {
+    const validations = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+    setPasswordErrors(validations);
+    return Object.values(validations).every(Boolean);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     
+    // Validate password strength
+    if (!validatePassword(formData.password)) {
+      setError("Please meet all password requirements");
+      return;
+    }
+
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
-      return;
-    }
-    
-    // Validate password strength
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
       return;
     }
     
@@ -127,7 +145,7 @@ export const Signup = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 p-6">
+    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto min-h-[50vh] max-h-[60vh] overflow-y-auto space-y-6 p-8">
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
@@ -152,15 +170,34 @@ export const Signup = ({ onSuccess }) => {
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
         />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          required
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-        />
+        <div className="space-y-2">
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+            value={formData.password}
+            onChange={(e) => {
+              setFormData({ ...formData, password: e.target.value });
+              validatePassword(e.target.value);
+            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+          />
+          <div className="text-sm space-y-1 text-gray-600">
+            <p className={passwordErrors.length ? "text-green-600" : "text-red-600"}>
+              ✓ At least 8 characters
+            </p>
+            <p className={passwordErrors.uppercase ? "text-green-600" : "text-red-600"}>
+              ✓ At least one uppercase letter
+            </p>
+            <p className={passwordErrors.lowercase ? "text-green-600" : "text-red-600"}>
+              ✓ At least one lowercase letter
+            </p>
+            <p className={passwordErrors.special ? "text-green-600" : "text-red-600"}>
+              ✓ At least one special character
+            </p>
+          </div>
+        </div>
         <input
           type="password"
           name="confirmPassword"
@@ -195,30 +232,32 @@ export const Signup = ({ onSuccess }) => {
             })}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
           />
-          <input
-            type="text"
-            name="city"
-            placeholder="City"
-            required
-            value={formData.address.city}
-            onChange={(e) => setFormData({ 
-              ...formData, 
-              address: { ...formData.address, city: e.target.value } 
-            })}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-          />
-          <input
-            type="text"
-            name="state"
-            placeholder="State/Province"
-            required
-            value={formData.address.state}
-            onChange={(e) => setFormData({ 
-              ...formData, 
-              address: { ...formData.address, state: e.target.value } 
-            })}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="city"
+              placeholder="City"
+              required
+              value={formData.address.city}
+              onChange={(e) => setFormData({ 
+                ...formData, 
+                address: { ...formData.address, city: e.target.value } 
+              })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            />
+            <input
+              type="text"
+              name="state"
+              placeholder="State/Province"
+              required
+              value={formData.address.state}
+              onChange={(e) => setFormData({ 
+                ...formData, 
+                address: { ...formData.address, state: e.target.value } 
+              })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            />
+          </div>
           <input
             type="text"
             name="zipCode"
@@ -242,3 +281,6 @@ export const Signup = ({ onSuccess }) => {
     </form>
   );
 };
+
+<motion.nav className="fixed top-0 left-0 right-0 z-50">
+</motion.nav>

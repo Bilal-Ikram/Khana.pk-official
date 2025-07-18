@@ -27,7 +27,7 @@ exports.signup = async (req, res) => {
     }
 
     // Validate address structure
-    if (!address || !address.street || !address.city || !address.state || !address.zipCode) {
+    if (!address || !address.street || !address.city ) {
       return res.status(400).json({ 
         message: 'Address must include street, city, state, and zipCode' 
       });
@@ -190,20 +190,34 @@ exports.login = async (req, res) => {
 // Middleware to verify JWT token
 exports.verifyToken = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    console.log('Verifying token...');
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+      console.error('No authorization header provided');
+      return res.status(401).json({ message: 'No authorization header provided' });
+    }
+    
+    const token = authHeader.split(' ')[1];
     
     if (!token) {
+      console.error('No token provided in authorization header');
       return res.status(401).json({ message: 'No token provided' });
     }
-
+    
+    console.log('Token format valid, verifying with JWT...');
     const decoded = jwt.verify(token, JWT_SECRET);
+    console.log('Token verified, decoded payload:', { id: decoded.id, role: decoded.role });
+    
     const user = await User.findById(decoded.id);
 
     if (!user) {
+      console.error('User not found for token:', decoded.id);
       return res.status(401).json({ message: 'User not found' });
     }
 
     if (!user.isActive) {
+      console.error('User account is inactive:', decoded.id);
       return res.status(403).json({ message: 'Account is inactive' });
     }
 
@@ -218,16 +232,21 @@ exports.verifyToken = async (req, res, next) => {
       ...user.toObject(),
       id: user._id
     };
+    
+    console.log('Token verification successful, proceeding to next middleware');
     next();
   } catch (error) {
-    console.error('Token verification error:', error);
+    console.error('Token verification failed:', error.message);
+    
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ message: 'Invalid token format' });
+      return res.status(401).json({ message: 'Invalid token' });
     }
+    
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token has expired' });
+      return res.status(401).json({ message: 'Token expired' });
     }
-    res.status(401).json({ message: 'Invalid token' });
+    
+    return res.status(500).json({ message: 'Error verifying token' });
   }
 };
 

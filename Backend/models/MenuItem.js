@@ -8,7 +8,7 @@ const menuItemSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
   price: {
@@ -75,5 +75,27 @@ const menuItemSchema = new mongoose.Schema({
 menuItemSchema.index({ restaurantId: 1 });
 menuItemSchema.index({ category: 1 });
 menuItemSchema.index({ isAvailable: 1 });
+
+// Add virtual field for reviews
+menuItemSchema.virtual('reviews', {
+  ref: 'Order',
+  localField: '_id',
+  foreignField: 'items.menuItemId',
+  match: { 
+    'rating.score': { $exists: true, $ne: null },
+    status: 'delivered'
+  }
+});
+
+// Add virtual field for average rating
+menuItemSchema.virtual('averageRating').get(function() {
+  if (!this.reviews || this.reviews.length === 0) return 0;
+  const sum = this.reviews.reduce((acc, order) => acc + order.rating.score, 0);
+  return (sum / this.reviews.length).toFixed(1);
+});
+
+// Ensure virtuals are included in JSON
+menuItemSchema.set('toJSON', { virtuals: true });
+menuItemSchema.set('toObject', { virtuals: true });
 
 module.exports = mongoose.model('MenuItem', menuItemSchema); 

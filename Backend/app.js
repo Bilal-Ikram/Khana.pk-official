@@ -23,7 +23,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/restaurants', require('./routes/restaurants'));
 app.use('/api/menu-items', require('./routes/menuItems'));
 app.use('/api/orders', require('./routes/orders'));
-
+app.use('/api/voice', require('./routes/voice'));
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

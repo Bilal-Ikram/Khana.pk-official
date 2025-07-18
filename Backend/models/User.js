@@ -8,8 +8,8 @@ const userSchema = new mongoose.Schema({
   address: {
     street: { type: String, required: true },
     city: { type: String, required: true },
-    state: { type: String, required: true },
-    zipCode: { type: String, required: true }
+    state: { type: String, required: false },
+    zipCode: { type: String, required: false }
   },
   role: { 
     type: String, 

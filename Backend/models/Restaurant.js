@@ -13,7 +13,7 @@ const restaurantSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
   cuisineType: {
@@ -131,5 +131,27 @@ restaurantSchema.index({ isActive: 1 });
 restaurantSchema.index({ cuisineType: 1 });
 restaurantSchema.index({ 'address.city': 1 });
 restaurantSchema.index({ rating: -1 });
+
+// Add virtual field for reviews
+restaurantSchema.virtual('reviews', {
+  ref: 'Order',
+  localField: '_id',
+  foreignField: 'restaurantId',
+  match: { 
+    'rating.score': { $exists: true, $ne: null },
+    status: 'delivered'
+  }
+});
+
+// Add virtual field for average rating
+restaurantSchema.virtual('averageRating').get(function() {
+  if (!this.reviews || this.reviews.length === 0) return 0;
+  const sum = this.reviews.reduce((acc, order) => acc + order.rating.score, 0);
+  return (sum / this.reviews.length).toFixed(1);
+});
+
+// Ensure virtuals are included in JSON
+restaurantSchema.set('toJSON', { virtuals: true });
+restaurantSchema.set('toObject', { virtuals: true });
 
 module.exports = mongoose.model('Restaurant', restaurantSchema); 
