@@ -69,7 +69,7 @@ const RestaurantManagement = () => {
               sunday: { open: '09:00', close: '22:00' }
             }
           });
-          setImageUrls(contextRestaurant.images?.map(img => `http://localhost:3001${img}`) || []);
+          setImageUrls(contextRestaurant.images?.map(img => `https://khana-backend-88zs.onrender.com${img}`) || []);
         }
       } catch (err) {
         console.error('Error initializing restaurant data:', err);
@@ -151,7 +151,7 @@ const RestaurantManagement = () => {
         formDataToSend.append('images', image);
       });
 
-      const response = await fetch('http://localhost:3001/api/restaurants/owner', {
+      const response = await fetch('https://khana-backend-88zs.onrender.com/api/restaurants/owner', {
         method: contextRestaurant ? 'PUT' : 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
