@@ -6,7 +6,7 @@
 // Optionally converts text back to speech using Text-to-Speech (TTS).
 // Provides callbacks to notify the UI about status changes, errors, or final transcription results.
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://khana-backend-88zs.onrender.com";
 
 class VoiceRecognitionService {
   constructor() {
