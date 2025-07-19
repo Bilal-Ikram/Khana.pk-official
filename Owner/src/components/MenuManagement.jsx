@@ -65,7 +65,7 @@ const MenuManagement = () => {
         throw new Error('Restaurant ID is missing');
       }
 
-      const response = await fetch(`http://localhost:3001/api/menu-items/restaurant/${restaurant._id}`, {
+      const response = await fetch(`https://khana-backend-88zs.onrender.com/api/menu-items/restaurant/${restaurant._id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -239,7 +239,7 @@ const MenuManagement = () => {
     try {
       setLoading(true);
       
-      const response = await fetch(`http://localhost:3001/api/menu-items/${itemId}/availability`, {
+      const response = await fetch(`https://khana-backend-88zs.onrender.com/api/menu-items/${itemId}/availability`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -267,7 +267,7 @@ const MenuManagement = () => {
     try {
       setLoading(true);
 
-      const response = await fetch(`http://localhost:3001/api/menu-items/${itemId}`, {
+      const response = await fetch(`https://khana-backend-88zs.onrender.com/api/menu-items/${itemId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
