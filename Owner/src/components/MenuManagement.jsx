@@ -201,8 +201,8 @@ const MenuManagement = () => {
       }
       
       const url = editingItem 
-        ? `http://localhost:3001/api/menu-items/${editingItem._id}`
-        : 'http://localhost:3001/api/menu-items';
+        ? `https://khana-backend-88zs.onrender.com/api/menu-items/${editingItem._id}`
+        : 'https://khana-backend-88zs.onrender.com/api/menu-items';
       
       const response = await fetch(url, {
         method: editingItem ? 'PUT' : 'POST',
