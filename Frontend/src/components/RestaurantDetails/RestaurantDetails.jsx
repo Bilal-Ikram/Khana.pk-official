@@ -32,8 +32,8 @@ const RestaurantDetails = () => {
   const fetchRestaurantDetails = useCallback(async () => {
     try {
       const [restaurantResponse, menuResponse] = await Promise.all([
-        fetch(`http://localhost:3001/api/restaurants/${id}`),
-        fetch(`http://localhost:3001/api/menu-items/restaurant/${id}`),
+        fetch(`https://khana-backend-88zs.onrender.com/api/restaurants/${id}`),
+        fetch(`https://khana-backend-88zs.onrender.com/api/menu-items/restaurant/${id}`),
       ]);
       if (!restaurantResponse.ok) {
         throw new Error("Failed to fetch restaurant details");
