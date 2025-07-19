@@ -8,7 +8,7 @@ import { toast } from 'react-hot-toast';
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, restaurant, token, refreshRestaurant, loading: authLoading } = useAuth();
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://khana-backend-88zs.onrender.com';
   const [stats, setStats] = useState({
     totalOrders: 0,
     totalRevenue: 0,
