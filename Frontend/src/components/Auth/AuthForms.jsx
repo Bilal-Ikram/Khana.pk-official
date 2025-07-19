@@ -125,7 +125,7 @@ export const Signup = ({ onSuccess }) => {
       // Remove confirmPassword before sending
       const { confirmPassword, ...signupData } = formData;
       
-      const response = await fetch("http://localhost:3001/api/auth/signup", {
+      const response = await fetch("https://khana-backend-88zs.onrender.com/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
