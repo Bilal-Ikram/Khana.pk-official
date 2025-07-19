@@ -112,7 +112,7 @@ const Checkout = () => {
 
       console.log('Sending order data:', orderData);
 
-      const response = await fetch('http://localhost:3001/api/orders', {
+      const response = await fetch('https://khana-backend-88zs.onrender.com/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
