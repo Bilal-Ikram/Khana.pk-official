@@ -19,7 +19,7 @@ const MenuItemDetail = () => {
   useEffect(() => {
     const fetchMenuItem = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/menu-items/${id}`);
+        const response = await fetch(`https://khana-backend-88zs.onrender.com/api/restaurants/api/menu-items/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch menu item');
         }
