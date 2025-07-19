@@ -62,7 +62,7 @@ const OrderManagement = () => {
         throw new Error('Not authorized to view orders');
       }
 
-      const url = `http://localhost:3001/api/orders/restaurant/${restaurant._id}${
+      const url = `https://khana-backend-88zs.onrender.com/api/orders/restaurant/${restaurant._id}${
         statusFilter !== 'all' ? `?status=${statusFilter}` : ''
       }`;
       
@@ -115,7 +115,7 @@ const OrderManagement = () => {
         throw new Error('Not authorized to update order status');
       }
 
-      const response = await fetch(`http://localhost:3001/api/orders/${orderId}/status`, {
+      const response = await fetch(`https://khana-backend-88zs.onrender.com/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
