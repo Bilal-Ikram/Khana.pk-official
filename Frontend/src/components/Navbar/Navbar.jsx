@@ -249,7 +249,7 @@ const Navbar = () => {
                 <button className="flex items-center gap-2 text-gray-700 hover:text-pink-500">
                   {user.profileImage ? (
                     <img
-                      src={`http://localhost:3001${user.profileImage}`}
+                      src={`https://khana-backend-88zs.onrender.com${user.profileImage}`}
                       alt="Profile"
                       className="w-8 h-8 rounded-full object-cover border-2 border-pink-100"
                     />
