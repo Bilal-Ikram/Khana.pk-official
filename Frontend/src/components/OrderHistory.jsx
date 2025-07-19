@@ -38,7 +38,7 @@ const OrderHistory = () => {
         throw new Error('No authentication token available');
       }
       
-      const response = await fetch('http://localhost:3001/api/orders/user/orders', {
+      const response = await fetch('https://khana-backend-88zs.onrender.com/api/orders/user/orders', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -66,7 +66,7 @@ const OrderHistory = () => {
 
   const submitRating = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/orders/${ratingOrder._id}/rating`, {
+      const response = await fetch(`https://khana-backend-88zs.onrender.com/api/orders/${ratingOrder._id}/rating`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
