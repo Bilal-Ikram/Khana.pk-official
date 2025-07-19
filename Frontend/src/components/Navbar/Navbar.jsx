@@ -321,7 +321,7 @@ const Navbar = () => {
                     <div className="flex items-center gap-3 mb-3">
                       {user.profileImage ? (
                         <img
-                          src={`http://localhost:3001${user.profileImage}`}
+                          src={`https://khana-backend-88zs.onrender.com${user.profileImage}`}
                           alt="Profile"
                           className="w-10 h-10 rounded-full object-cover border-2 border-pink-100"
                         />
