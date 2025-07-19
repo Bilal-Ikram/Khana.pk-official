@@ -3,7 +3,7 @@
 const register = async (userData) => {
   try {
     setLoading(true);
-    const response = await fetch('http://localhost:3001/api/auth/seller/signup', {
+    const response = await fetch('https://khana-backend-88zs.onrender.com/api/auth/seller/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
