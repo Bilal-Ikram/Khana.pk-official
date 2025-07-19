@@ -69,7 +69,10 @@ const RestaurantManagement = () => {
               sunday: { open: '09:00', close: '22:00' }
             }
           });
-          setImageUrls(contextRestaurant.images?.map(img => `https://khana-backend-88zs.onrender.com${img}`) || []);
+          setImageUrls(contextRestaurant.images?.map(img => { if (img.startsWith('http')) return img; // already a URL
+                                                             return `https://khana-backend-88zs.onrender.com${img}`;
+                                                            }) || []);
+
         }
       } catch (err) {
         console.error('Error initializing restaurant data:', err);
