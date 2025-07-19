@@ -588,7 +588,7 @@ const MenuManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {item.image ? (
                         <img
-                          src={`http://localhost:3001${item.image}`}
+                          src={`https://khana-backend-88zs.onrender.com${item.image}`}
                           alt={item.name}
                           className="w-16 h-16 object-cover rounded-md"
                           onError={(e) => {
