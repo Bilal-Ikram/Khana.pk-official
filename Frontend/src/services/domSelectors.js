@@ -339,9 +339,31 @@ console.log("DOM_SELECTORS.KHANA_PK:", DOM_SELECTORS.KHANA_PK);
 
 export const PLATFORM_DETECTION = {
   "khana.pk": "KHANA_PK",
-  localhost: "KHANA_PK",
-  "www.khana.pk": "KHANA_PK", // optionally handle 'www'
+  "www.khana.pk": "KHANA_PK",
+  "localhost": "KHANA_PK",
+  "khana-pk-official.vercel.app": "KHANA_PK",
 };
+
+// Or use a more flexible detection function:
+export function detectPlatform() {
+  const hostname = window.location.hostname;
+  
+  // Direct mapping first
+  if (PLATFORM_DETECTION[hostname]) {
+    return PLATFORM_DETECTION[hostname];
+  }
+  
+  // Flexible matching for development/staging URLs
+  if (hostname.includes('khana-pk') || 
+      hostname.includes('localhost') || 
+      hostname.includes('khana.pk')) {
+    return 'KHANA_PK';
+  }
+  
+  // Default fallback
+  console.warn(`Unknown platform: ${hostname}, defaulting to KHANA_PK`);
+  return 'KHANA_PK';
+}
 
 // === SELECTOR UTILITIES ===
 export class SelectorManager {
