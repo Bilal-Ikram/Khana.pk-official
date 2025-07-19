@@ -52,10 +52,9 @@ app.use((req, res, next) => {
 // CORS Configuration
 const corsOptions = {
   origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
     "http://localhost:3001",
     "http://localhost:5175",
+    "https://khana-pk-official.vercel.app"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
