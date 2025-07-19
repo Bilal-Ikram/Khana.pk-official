@@ -64,7 +64,7 @@ const HeroSection = () => {
       setShowSuggestions(false);
 
       // Get the API URL from environment variables or use the default
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://khana-backend-88zs.onrender.com';
       
       // Call the backend API to search for restaurants in the specified location
       const response = await axios.get(`${apiUrl}/api/restaurants`, {
