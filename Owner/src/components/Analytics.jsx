@@ -43,7 +43,7 @@ const Analytics = () => {
         }
 
         // Fetch analytics data
-        const response = await fetch('http://localhost:3001/api/orders/seller/stats', {
+        const response = await fetch('https://khana-backend-88zs.onrender.com/api/orders/seller/stats', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
