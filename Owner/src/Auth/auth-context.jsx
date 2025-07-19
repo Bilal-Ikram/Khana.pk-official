@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://khana-backend-88zs.onrender.com';
 
   const refreshRestaurant = async () => {
     try {
