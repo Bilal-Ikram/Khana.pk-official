@@ -49,7 +49,7 @@ const MenuItemDetail = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return getDefaultImage();
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:3001${imagePath}`;
+    return `https://khana-backend-88zs.onrender.com${imagePath}`;
   };
 
   const addToCart = () => {
