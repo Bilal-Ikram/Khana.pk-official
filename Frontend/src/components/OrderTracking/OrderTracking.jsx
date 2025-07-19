@@ -88,7 +88,7 @@ const OrderTracking = () => {
         hasToken: true
       });
 
-      const response = await fetch(`http://localhost:3001/api/orders/${id}`, {
+      const response = await fetch(`https://khana-backend-88zs.onrender.com/api/orders/${id}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -328,7 +328,7 @@ const OrderTracking = () => {
     setSubmittingRating(true);
 
     try {
-      const response = await fetch(`http://localhost:3001/api/orders/${id}/rating`, {
+      const response = await fetch(`https://khana-backend-88zs.onrender.com/api/orders/${id}/rating`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
