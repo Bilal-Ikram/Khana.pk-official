@@ -42,7 +42,7 @@ const MenuManagement = () => {
         await refreshRestaurant();
 
         if (!restaurant) {
-          setError('You need to create a restaurant before you can manage the menu.');
+          setError('You need to create a restaurant before you can manage the menus.');
           navigate('/seller/restaurant');
           return;
         }
