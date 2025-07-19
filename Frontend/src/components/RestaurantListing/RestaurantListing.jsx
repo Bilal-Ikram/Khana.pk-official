@@ -76,7 +76,7 @@ const RestaurantListing = () => {
   }, []);
   const fetchRestaurants = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
+      const apiUrl = import.meta.env.VITE_API_URL || "https://khana-backend-88zs.onrender.com";
       const response = await axios.get(`${apiUrl}/api/restaurants`);
       setRestaurants(response.data);
     } catch {
@@ -94,7 +94,7 @@ const RestaurantListing = () => {
     }
     setSearchLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
+      const apiUrl = import.meta.env.VITE_API_URL || "https://khana-backend-88zs.onrender.com";
       const response = await axios.get(`${apiUrl}/api/restaurants/search`, {
         params: { q: query },
       });
