@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 
 const Settings = () => {
   const { user, token } = useAuth();
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://khana-backend-88zs.onrender.com';
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
