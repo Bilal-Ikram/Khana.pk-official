@@ -20,7 +20,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (user?.profileImage) {
-      setPreviewUrl(`http://localhost:3001${user.profileImage}`);
+      setPreviewUrl(`https://khana-backend-88zs.onrender.com${user.profileImage}`);
     }
   }, [user]);
 
@@ -60,7 +60,7 @@ const Profile = () => {
         formDataToSend.append('profileImage', profileImage);
       }
 
-      const response = await fetch('http://localhost:3001/api/auth/profile', {
+      const response = await fetch('https://khana-backend-88zs.onrender.com/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
