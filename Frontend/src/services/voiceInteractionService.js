@@ -1092,50 +1092,90 @@ class EnhancedVoiceOrderingService {
     return null;
   }
 
-  findElements(selectorType, parent = document) {
-    if (selectorManager && selectorManager.findElements) {
-      return Array.from(selectorManager.findElements(selectorType, parent));
+findElements(selectorType, parent = document) {
+  // Debug logging
+  console.log(`🔍 Looking for elements of type: ${selectorType}`);
+  console.log(`📍 selectorManager available:`, !!selectorManager);
+  
+  if (selectorManager && selectorManager.findElements) {
+    console.log(`✅ Using selectorManager for ${selectorType}`);
+    try {
+      const result = Array.from(selectorManager.findElements(selectorType, parent));
+      console.log(`🎯 selectorManager found ${result.length} elements`);
+      return result;
+    } catch (error) {
+      console.warn(`⚠️ selectorManager failed for ${selectorType}:`, error);
     }
-
-    // Fallback to basic selectors
-    const selectors = this.getBasicSelectors(selectorType);
-    for (const selector of selectors) {
-      const elements = parent.querySelectorAll(selector);
-      if (elements.length > 0) return Array.from(elements);
-    }
-    return [];
   }
 
-  getBasicSelectors(type) {
-    const selectors = {
-      restaurantCard: [
-        '[data-testid="restaurant-card"]',
-        ".restaurant-card",
-        ".card",
-      ],
-      menuItem: ['[data-testid="menu-item"]', ".menu-item", ".card"],
-      addToCartButton: [
-        '[data-testid="add-to-cart"]',
-        ".add-to-cart",
-        "button",
-      ],
-      cartLink: [
-        '[data-testid="cart-icon"]',
-        ".cart-icon",
-        'a[href="/cart"]',
-        'a[href*="cart"]',
-      ],
-      cartItem: ['[data-testid="cart-item"]', ".cart-item"],
-      proceedToCheckoutButton: [
-        '[data-testid="checkout"]',
-        ".checkout-button",
-        "button",
-      ],
-      homeLink: ['[data-testid="home-link"]', 'a[href="/"]', ".home-link"],
-    };
-
-    return selectors[type] || [];
+  // Fallback to basic selectors
+  console.log(`🔄 Falling back to basic selectors for ${selectorType}`);
+  const selectors = this.getBasicSelectors(selectorType);
+  console.log(`📝 Available selectors:`, selectors);
+  
+  for (const selector of selectors) {
+    const elements = parent.querySelectorAll(selector);
+    if (elements.length > 0) {
+      console.log(`✅ Found ${elements.length} elements with selector: ${selector}`);
+      return Array.from(elements);
+    }
   }
+  
+  console.log(`❌ No elements found for ${selectorType}`);
+  return [];
+}
+
+
+getBasicSelectors(type) {
+  // Detect current page context
+  const currentPage = this.detectPageFromURL();
+  
+  let selectorSource;
+  switch(currentPage) {
+    case 'RestaurantDetails':
+      selectorSource = DOM_SELECTORS.KHANA_PK.RESTAURANT_DETAILS;
+      break;
+    case 'RestaurantListing':
+    default:
+      selectorSource = DOM_SELECTORS.KHANA_PK.RESTAURANT_LISTING;
+      break;
+  }
+  
+  // Return the selectors for the requested type
+  if (selectorSource && selectorSource[type]) {
+    return selectorSource[type];
+  }
+  
+  // Fallback to basic selectors if not found in comprehensive list
+  const basicSelectors = {
+    restaurantCard: [
+      '[data-testid="restaurant-card"]',
+      ".restaurant-card",
+      ".card",
+    ],
+    menuItem: ['[data-testid="menu-item"]', ".menu-item", ".card"],
+    addToCartButton: [
+      '[data-testid="add-to-cart"]',
+      ".add-to-cart",
+      "button",
+    ],
+    cartLink: [
+      '[data-testid="cart-icon"]',
+      ".cart-icon",
+      'a[href="/cart"]',
+      'a[href*="cart"]',
+    ],
+    cartItem: ['[data-testid="cart-item"]', ".cart-item"],
+    proceedToCheckoutButton: [
+      '[data-testid="checkout"]',
+      ".checkout-button",
+      "button",
+    ],
+    homeLink: ['[data-testid="home-link"]', 'a[href="/"]', ".home-link"],
+  };
+
+  return basicSelectors[type] || [];
+}
 
   textMatches(text, target) {
     // Normalize: lowercase + remove non-alphanumeric
