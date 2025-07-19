@@ -548,7 +548,7 @@ useEffect(() => {
 
       {/* Enhanced Transcript Display */}
       {transcript && !showProcessing && (
-        <div className="fixed bottom-32 md:left-8 bg-white/90 backdrop-blur-lg p-6 rounded-3xl shadow-2xl max-w-300px md:max-w-md border border-white/20 mx-auto">
+        <div className="fixed bottom-32 md:left-8 bg-white/90 backdrop-blur-lg p-6 rounded-3xl shadow-2xl max-w-300px md:max-w-md border border-white/20 mx-auto z-50">
           <div className="flex items-start space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
               <Mic className="w-4 h-4 text-white" />
