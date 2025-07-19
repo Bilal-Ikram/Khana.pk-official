@@ -1,4 +1,18 @@
 require("dotenv").config();
+
+const fs = require('fs');
+
+// Check if JSON is available in env
+if (process.env.GOOGLE_CREDENTIALS_JSON) {
+  fs.writeFileSync(
+    './google-credentials.json',
+    process.env.GOOGLE_CREDENTIALS_JSON
+  );
+
+  process.env.GOOGLE_APPLICATION_CREDENTIALS = './google-credentials.json';
+}
+
+
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
