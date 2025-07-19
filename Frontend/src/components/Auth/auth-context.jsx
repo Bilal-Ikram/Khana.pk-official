@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from 'react-hot-toast';
 
 const AuthContext = createContext();
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'https://khana-backend-88zs.onrender.com/api';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
