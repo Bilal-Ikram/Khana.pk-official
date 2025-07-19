@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://khana-backend-88zs.onrender.com";
 
 class VoiceService {
   async processVoiceCommand(text, language = "en-US") {
