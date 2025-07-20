@@ -387,7 +387,8 @@ useEffect(() => {
                     </div>
                     <div className="bg-green-50 p-3 rounded-xl">
                       <p className="text-sm text-green-700 font-medium">
-                        e.g. &quot;Order Burger from kababjess&quot;
+                        e.g. &quot;Order Burger from kababjess&quot; <br />
+                            &quot;Order Nihari from Zahid Nihari&quot;
                       </p>
                     </div>
                     
