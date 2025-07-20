@@ -113,24 +113,7 @@ cd admin
 npm install
 ```
 
-5. Set up environment variables
 
-Backend `.env`:
-```env
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-PORT=3001
-NODE_ENV=development
-```
-
-Frontend `.env`:
-```env
-VITE_API_URL=http://localhost:3001
-```
-
-Admin `.env`:
-```env
-VITE_API_URL=http://localhost:3001
 ```
 
 ## 🏃‍♂️ Running the Application
