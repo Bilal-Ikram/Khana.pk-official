@@ -1,6 +1,6 @@
 # Khana.pk - Food Delivery Platform 🍽️
 
-Khana.pk is a modern full-stack food delivery platform that connects customers with local restaurants for seamless food ordering and delivery. Built with cutting-edge technologies and best practices.
+Khana.pk (https://khana-pk-official.vercel.app/) is a modern full-stack food delivery platform that connects customers with local restaurants for seamless food ordering and delivery. Built with cutting-edge technologies and best practices.
 
 ## 🌟 Features
 
